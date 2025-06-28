@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-REPO_USER="yourusername"
+REPO_USER="diligentmoves"
 REPO_NAME="mautic-docker"
 BRANCH="main"
 TARGET_DIR="mautic-docker"
