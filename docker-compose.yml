@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   mautic:
     image: mautic/mautic:5-apache
@@ -5,27 +7,24 @@ services:
     depends_on:
       - db
     environment:
-      - MAUTIC_DB_HOST=${MAUTIC_DB_HOST}
-      - MAUTIC_DB_NAME=${MAUTIC_DB_NAME}
-      - MAUTIC_DB_USER=${MAUTIC_DB_USER}
-      - MAUTIC_DB_PASSWORD=${MAUTIC_DB_PASSWORD}
+      - MAUTIC_DB_HOST=db
+      - MAUTIC_DB_NAME=mautic
+      - MAUTIC_DB_USER=mautic
+      - MAUTIC_DB_PASSWORD=mauticpass
+    ports:
+      - "8081:80"  # Direct access for debugging
     volumes:
-      - mautic_data:/var/www/html
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.mautic.rule=Host(`${MAUTIC_HOST}`)"
-      - "traefik.http.routers.mautic.entrypoints=websecure"
-      - "traefik.http.routers.mautic.tls.certresolver=myresolver"
+      - mautic_data:/var/www/html  # Will be wiped and rebuilt
     restart: unless-stopped
 
   db:
     image: mariadb:10.6
     container_name: mautic-db
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MAUTIC_DB_NAME}
-      - MYSQL_USER=${MAUTIC_DB_USER}
-      - MYSQL_PASSWORD=${MAUTIC_DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=mautic
+      - MYSQL_USER=mautic
+      - MYSQL_PASSWORD=mauticpass
     volumes:
       - db_data:/var/lib/mysql
     restart: unless-stopped
@@ -39,7 +38,7 @@ services:
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=${EMAIL}"
+      - "--certificatesresolvers.myresolver.acme.email=admin@example.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
